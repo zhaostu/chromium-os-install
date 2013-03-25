@@ -10,6 +10,7 @@ usage(){
     echo "IMAGE:   The Chromium OS image file."
     echo "STATE:   The target partition for the stateful partition."
     echo "ROOT:    The target partition for the root partition."
+    exit 1
 }
 
 copy_partition(){
@@ -18,6 +19,12 @@ copy_partition(){
 
     # Get the "start at" of the source partition.
     part_start=$(parted -ms $image_file unit B print | grep "$part_label" | cut -d ":" -f 2)
+    # Test if there is a size.
+    if [ -z $part_start ]; then
+        echo "Invalid image file $image_file. Did you unzip the file after downloading?"
+        exit 1
+    fi
+
     part_start="${part_start%?}"
     echo "Partition $part_label starts from byte $part_start"
 
@@ -60,8 +67,8 @@ copy_partition(){
 
 # Print usage if there are not enough parameters.
 if [ $# -lt 3 ] ; then
+    echo "Not enough parameters."
     usage
-    exit 1
 fi
 
 image_file=$1
@@ -73,19 +80,16 @@ root_target=$3
 if [ ! -f $image_file ]; then
     echo "Image file $image_file does not exist!"
     usage
-    exit 1
 fi
 
 if [ ! -b $state_target ]; then
     echo "Device $state_target does not exist!"
     usage
-    exit 1
 fi
 
 if [ ! -b $root_target ]; then
     echo "Device $root_target does not exist!"
     usage
-    exit 1
 fi
 
 copy_partition $2 'STATE'
