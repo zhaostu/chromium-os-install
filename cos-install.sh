@@ -47,7 +47,7 @@ copy_partition(){
     echo "WARNING: Backup your data, otherwise the data will be erased!"
     read -p "If you do, enter \"erase\". Otherwise, enter something else: " yn
 
-    if [ $yn = "erase" ]; then
+    if [ "$yn" = "erase" ]; then
         echo "Erasing $target_dev ..."
         sudo rm -rf $target_mount/*
     else
